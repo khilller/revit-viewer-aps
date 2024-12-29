@@ -13,7 +13,14 @@ export async function GET(
       return NextResponse.json({ status: 'n/a' });
     }
 
-    let messages: any[] = [];
+    interface Message {
+      type?: string;
+      message?: string | string[];
+      code?: string;
+      severity?: number;
+    }
+
+    let messages: Message[] = [];
     if (manifest.derivatives) {
       for (const derivative of manifest.derivatives) {
         messages = messages.concat(derivative.messages || []);
