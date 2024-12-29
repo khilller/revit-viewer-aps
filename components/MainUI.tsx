@@ -84,9 +84,9 @@ function MainUIContent() {
 
   return (
     <main className="h-screen flex flex-col">
-      <header className="h-16 flex items-center justify-between px-4 border-b z-50 relative">
+      <header className="h-auto min-h-[4rem] flex flex-col sm:flex-row sm:h-16 items-center justify-between p-4 border-b z-50 relative gap-4">
         <Link href="/" className="text-xl font-bold">Revit Viewer</Link>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col w-full sm:w-auto sm:flex-row items-stretch sm:items-center gap-4">
           <ModelSelector
             selectedUrn={selectedUrn}
             onModelSelect={handleModelSelect}
