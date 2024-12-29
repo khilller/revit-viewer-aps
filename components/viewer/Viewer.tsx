@@ -121,12 +121,17 @@ export default function Viewer({ urn, className }: ViewerProps) {
   useEffect(() => {
     if (!viewer || !urn) return;
 
+    let isModelLoaded = false;
+
     const loadModelInViewer = async () => {
+      if (isModelLoaded) return; // Skip if model is already loaded
+
       try {
         const status = await checkTranslationStatus(urn);
         
-        if (status.status === 'success') {
+        if (status.status === 'success' || status.status === 'complete') {
           await loadModel(viewer, urn);
+          isModelLoaded = true; // Set flag after successful load
         } else if (status.status === 'inprogress') {
           setTimeout(() => loadModelInViewer(), 5000);
         }
