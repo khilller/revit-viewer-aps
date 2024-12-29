@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Viewer from '@/components/viewer/Viewer';
 import ModelSelector from '@/components/ModelSelector/ModelSelector';
@@ -8,7 +8,8 @@ import ModelUploader from '@/components/ModalUploader/ModelUploader';
 import StatusOverlay from '@/components/StatusOverlay/StatusOverlay';
 import { ModelInfo, TranslationStatus } from '@/types/app';
 
-export default function Home() {
+// New component to handle URL params
+function MainUIContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedUrn, setSelectedUrn] = useState<string>('');
@@ -109,5 +110,14 @@ export default function Home() {
         isVisible={!!status && status.status !== 'success'}
       />
     </main>
+  );
+}
+
+// Main component with Suspense
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MainUIContent />
+    </Suspense>
   );
 }
