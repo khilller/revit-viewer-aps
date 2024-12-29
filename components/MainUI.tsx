@@ -7,6 +7,7 @@ import ModelSelector from '@/components/ModelSelector/ModelSelector';
 import ModelUploader from '@/components/ModalUploader/ModelUploader';
 import StatusOverlay from '@/components/StatusOverlay/StatusOverlay';
 import { ModelInfo, TranslationStatus } from '@/types/app';
+import Link from 'next/link';
 
 // New component to handle URL params
 function MainUIContent() {
@@ -84,7 +85,7 @@ function MainUIContent() {
   return (
     <main className="h-screen flex flex-col">
       <header className="h-16 flex items-center justify-between px-4 border-b z-50 relative">
-        <h1 className="text-xl font-bold">Revit Viewer</h1>
+        <Link href="/" className="text-xl font-bold">Revit Viewer</Link>
         <div className="flex items-center gap-4">
           <ModelSelector
             selectedUrn={selectedUrn}
