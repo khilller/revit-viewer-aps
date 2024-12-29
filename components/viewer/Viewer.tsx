@@ -4,6 +4,16 @@ import { useEffect, useRef, useState } from 'react';
 import { ViewerContext } from './ViewerContext';
 import { ViewerProps } from '@/types/app';
 
+interface ViewerInitializerOptions {
+  env: string;
+  api: string;
+  getAccessToken: (callback: (token: string, expires: number) => void) => void;
+}
+
+interface ViewerConfig {
+  extensions: string[];
+}
+
 async function getAccessToken(callback: (token: string, expires: number) => void) {
   try {
     const resp = await fetch('/api/auth/token');
@@ -25,13 +35,15 @@ async function initViewer(container: HTMLElement): Promise<Autodesk.Viewing.GuiV
     }
 
     try {
-      Autodesk.Viewing.Initializer({ 
+      const options: ViewerInitializerOptions = {
         env: 'AutodeskProduction', 
         api: 'derivativeV2',
         getAccessToken: getAccessToken 
-      }, () => {
+      };
+
+      Autodesk.Viewing.Initializer(options, () => {
         try {
-          const config = {
+          const config: ViewerConfig = {
             extensions: ['Autodesk.DocumentBrowser', 'Autodesk.FullScreen']
           };
           const viewer = new Autodesk.Viewing.GuiViewer3D(container, config);
@@ -41,7 +53,7 @@ async function initViewer(container: HTMLElement): Promise<Autodesk.Viewing.GuiV
           
           viewer.loadExtension('Autodesk.DocumentBrowser').then(() => {
             resolve(viewer);
-          }).catch((err) => {
+          }).catch(() => {
             resolve(viewer);
           });
         } catch (error) {
@@ -60,7 +72,7 @@ async function loadModel(viewer: Autodesk.Viewing.GuiViewer3D, urn: string): Pro
       viewer.loadDocumentNode(doc, doc.getRoot().getDefaultGeometry());
       resolve();
     }
-    function onDocumentLoadFailure(code: number, message: string, errors: any[]) {
+    function onDocumentLoadFailure(code: number, message: string, errors: unknown[]) {
       reject({ code, message, errors });
     }
     viewer.setLightPreset(0);

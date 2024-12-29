@@ -32,19 +32,29 @@ export async function getViewerToken() {
   return credentials;
 }
 
+interface ApiError {
+  axiosError?: {
+    response?: {
+      status: number;
+    };
+  };
+  message: string;
+}
+
 export async function ensureBucketExists(bucketKey: string) {
   const token = await getInternalToken();
   try {
     await ossClient.getBucketDetails(bucketKey, { accessToken: token });
-  } catch (err: any) {
-    if (err.axiosError?.response?.status === 404) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    if (error.axiosError?.response?.status === 404) {
       await ossClient.createBucket(
         Region.Us,
         { bucketKey, policyKey: PolicyKey.Persistent },
         { accessToken: token }
       );
     } else {
-      throw err;
+      throw error;
     }
   }
 }
@@ -92,11 +102,12 @@ export async function getManifest(urn: string) {
   const token = await getInternalToken();
   try {
     return await modelDerivativeClient.getManifest(urn, { accessToken: token });
-  } catch (err: any) {
-    if (err.axiosError?.response?.status === 404) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    if (error.axiosError?.response?.status === 404) {
       return null;
     }
-    throw err;
+    throw error;
   }
 }
 
