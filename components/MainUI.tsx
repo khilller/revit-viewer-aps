@@ -23,13 +23,10 @@ function MainUIContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Clear any existing interval first
     if (statusCheckInterval) {
       clearInterval(statusCheckInterval);
-      setStatusCheckInterval(undefined);
     }
 
-    // Don't do anything if there's no URN
     if (!selectedUrn) {
       setStatus(null);
       return;
@@ -40,26 +37,25 @@ function MainUIContent() {
         const response = await fetch(`/api/models/${selectedUrn}/status`);
         if (!response.ok) throw new Error(await response.text());
         const newStatus: TranslationStatus = await response.json();
-        console.log('Status data:', newStatus);
         setStatus(newStatus);
+
+        if (newStatus.status === 'success' || newStatus.status === 'failed') {
+          clearInterval(statusCheckInterval);
+          setStatusCheckInterval(undefined);
+        }
       } catch (error) {
         console.error('Error checking status:', error);
+        clearInterval(statusCheckInterval);
+        setStatusCheckInterval(undefined);
       }
     };
 
-    // Do initial check
     checkStatus();
-
-    // Only set up polling if status is explicitly 'inprogress'
-    if (status?.status === 'inprogress') {
-      const interval = setInterval(checkStatus, 5000);
-      setStatusCheckInterval(interval);
-    }
+    const interval = setInterval(checkStatus, 5000);
+    setStatusCheckInterval(interval);
 
     return () => {
-      if (statusCheckInterval) {
-        clearInterval(statusCheckInterval);
-      }
+      clearInterval(interval);
     };
   }, [selectedUrn]);
 
